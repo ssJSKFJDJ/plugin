@@ -20,6 +20,7 @@
 task_call = {
     news = "news",
 }
+
 notice_head = ".send notice 8 "
 
 function table_draw(tab)
