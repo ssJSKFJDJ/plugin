@@ -1,7 +1,3 @@
---仿SitaNya的.team call指令插件.  ver1.1  made by 地窖上的松
---灵感来自于塔骰的team功能
---发布更新于dice!论坛与简律纯的项目：https://github.com/ssJSKFJDJ/plugin
-
 --[[目前已知的漏洞：
 1.show部分中文字符会出现乱码，目前没有解决方案
 2.指令所有人均可用，没有是否是kp的限制，往后也许会添加设定kp的.kp指令]] --
@@ -174,7 +170,7 @@ function team_show(msg) --展示本群team成员
                 sleepTime(sleep_time)
                 local k = getPlayerCardAttr(j[i], msg.fromGroup, "__Name", "角色卡") --获取群员名字
                 if k == "角色卡" then
-                    k = getUserConf(msg.fromQQ, "nick#" .. msg.fromGroup, j[i]) --如果没有用nn指令设置名字的话就使用群名，群名都没有（应该不会吧）的话就使用QQ号
+                    k = getUserConf(j[i], "nick#" .. msg.fromGroup, j[i]) --如果没有用nn指令设置名字的话就使用群名，群名都没有（应该不会吧）的话就使用QQ号
                 end
                 sendMsg(k, msg.fromGroup, 0)
             end
