@@ -1,4 +1,6 @@
-# plugin
+## plugin
+
+> 如果你是Dice!脚本作者，那么你可以[fork plugin](https://github.com/ssJSKFJDJ/plugin)仓库，然后按格式提交PR。
 
 [![License](https://img.shields.io/github/license/ssJSKFJDJ/plugin.svg)](http://www.gnu.org/licenses)
 [![Downloads](https://img.shields.io/github/downloads/ssJSKFJDJ/plugin/total.svg)](https://github.com/ssJSKFJDJ/plugin/releases)
@@ -8,7 +10,8 @@
 [![PR数量](https://img.shields.io/github/issues-pr/ssJSKFJDJ/plugin.svg)](https://github.com/ssJSKFJDJ/plugin/pulls)
 [![单个lua文件](https://img.shields.io/github/directory-file-count/ssJSKFJDJ/plugin/Single%20File?extension=lua&label=Single%20Lua%20File&type=file)](https://github.com/ssJSKFJDJ/plugin/tree/main/Single%20File)
 [![多个lua文件](https://img.shields.io/github/directory-file-count/ssJSKFJDJ/plugin/Mutiple%20Files?label=Mutiple%20lua%20File&type=dir)](https://github.com/ssJSKFJDJ/plugin/tree/main/Single%20File)
-# WARNING
+
+### WARNING
 
 注意，请**按照格式和规范**提交pr:
 
@@ -20,7 +23,12 @@
    -------------------------------
    ```
    这么做的理由是为了让您的脚本在被他人下载使用时，让他人知晓作者是谁，(若有报错)如何联系，能否二次演绎(协议)。
-   随后请将你的lua脚本提交至[Single File](https://github.com/ssJSKFJDJ/plugin/tree/main/Single%20File)文件夹。
+   
+   随后请将你的lua脚本提交至[Single File](https://github.com/ssJSKFJDJ/plugin/tree/main/Single%20File)文件夹，并在该文件夹下的README.md内最新一行写上:
+   ```md
+   日期，脚本文件（包含.lua扩展名），作者名（联系方式)
+   #比如:2022年10月30日,DailyNews.lua,简律纯
+   ```
 2. 若您的脚本包含`*.lua`文件数量过多或是包含文件夹，请将它们全部放在一个以脚本名命名的文件夹内上传，并附上`README.md`简单介绍各个文件的作用以及一些作者信息。
    它们将会是这样的:
    ```
@@ -43,4 +51,8 @@
    作者:xxx
    联系方式：xxx@xxx.xxxx
    ```
-   随后请将你的文件夹提交至[Mutiple Files](https://github.com/ssJSKFJDJ/plugin/tree/main/Mutiple%20Files)文件夹。
+   随后请将你的文件夹提交至[Mutiple Files](https://github.com/ssJSKFJDJ/plugin/tree/main/Mutiple%20Files)文件夹,并在该文件夹下的README.md新增一行:
+   ```md
+   日期，你上传的主文件夹名，作者名（联系方式)
+   #比如:2022年10月30日,team call,Pine
+   ```
