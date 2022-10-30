@@ -6,7 +6,7 @@
 
 [![issue数量](https://img.shields.io/github/issues/ssJSKFJDJ/plugin.svg)](https://github.com/ssJSKFJDJ/plugin/issues)
 [![PR数量](https://img.shields.io/github/issues-pr/ssJSKFJDJ/plugin.svg)](https://github.com/ssJSKFJDJ/plugin/pulls)
-[![单个lua文件](https://img.shields.io/github/directory-file-count/ssJSKFJDJ/plugin/Single%20lua%20File?extension=lua&label=Single%20File&type=file)](https://github.com/ssJSKFJDJ/plugin/tree/main/Single%20File)
+[![单个lua文件](https://img.shields.io/github/directory-file-count/ssJSKFJDJ/plugin/Single%%20File?extension=lua&label=Single%20Lua%20File&type=file)](https://github.com/ssJSKFJDJ/plugin/tree/main/Single%20File)
 [![多个lua文件](https://img.shields.io/github/directory-file-count/ssJSKFJDJ/plugin/Mutiple%20Files?label=Mutiple%20lua%20File&type=dir)](https://github.com/ssJSKFJDJ/plugin/tree/main/Single%20File)
 # WARNING
 
