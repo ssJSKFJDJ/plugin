@@ -25,7 +25,7 @@
    ```
    这么做的理由是为了让您的脚本在被他人下载使用时，让他人知晓作者是谁，(若有报错)如何联系，能否二次演绎(协议)。
    
-   随后请将你的lua脚本提交至[Single File](https://github.com/ssJSKFJDJ/plugin/tree/main/Single%20File)文件夹，并在该文件夹下的README.md内找到当天日期（如没有就添加一个）写上:
+   随后请将你的lua脚本提交至[Single File](https://github.com/ssJSKFJDJ/plugin/tree/main/Single%20File)文件夹，并在该文件夹下的[README.md](https://github.com/ssJSKFJDJ/plugin/blob/main/Single%20File/README.md)内找到当天日期（如没有就添加一个）写上:
    ```md
    日期:
       - 脚本文件（包含.lua扩展名） by 作者名（联系方式)
@@ -56,7 +56,7 @@
    作者:xxx
    联系方式：xxx@xxx.xxxx
    ```
-   随后请将你的文件夹提交至[Mutiple Files](https://github.com/ssJSKFJDJ/plugin/tree/main/Mutiple%20Files)文件夹,并在该文件夹下的README.md内找到当天日期（如没有就添加一个）写上:
+   随后请将你的文件夹提交至[Mutiple Files](https://github.com/ssJSKFJDJ/plugin/tree/main/Mutiple%20Files)文件夹,并在该文件夹下的[README.md](https://github.com/ssJSKFJDJ/plugin/blob/main/Mutiple%20Files/README.md)内找到当天日期（如没有就添加一个）写上:
    ```md
    日期:
       - 你上传的文件夹名称 by 作者名（联系方式)
