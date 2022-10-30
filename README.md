@@ -1,7 +1,7 @@
 
 ## plugin
 
-> 如果你是Dice!脚本作者，那么你可以[fork plugin](https://github.com/ssJSKFJDJ/plugin)仓库，然后按格式提交PR。
+> 如果你是Dice!脚本作者，那么你可以[fork plugin](https://github.com/ssJSKFJDJ/plugin/fork)仓库，然后按格式提交PR。
 
 [![License](https://img.shields.io/github/license/ssJSKFJDJ/plugin.svg)](http://www.gnu.org/licenses)
 [![Downloads](https://img.shields.io/github/downloads/ssJSKFJDJ/plugin/total.svg)](https://github.com/ssJSKFJDJ/plugin/releases)
