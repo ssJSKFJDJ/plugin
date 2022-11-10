@@ -1,10 +1,20 @@
 --[[目前已知的漏洞：
 1.show部分中文字符会出现乱码，目前没有解决方案
-2.指令所有人均可用，没有是否是kp的限制，往后也许会添加设定kp的.kp指令]] --
+2.指令所有人均可用，没有是否是kp的限制，往后也许会添加设定kp的.kp指令（不过这真的有必要吗）]] --
 
-sleep_time = 1021 --这是艾特与show时的间歇时间（毫秒数），设为0可能会有风险，太长了可能影响使用
+-------------------------------------------------------------------------
+--配置参数设定--
+sleep_time = 1021 --这是艾特时的间歇时间（毫秒数），设为0可能会有风险，太长了可能影响使用
+-------------------------------------------------------------------------
 
---核心函数部分--
+
+--本来是想写自定义回执部分的，但是太麻烦还是算了。想改回执的骰主可以在插件运行流程那里改，或者直接来找我也可以
+call_help_text = "仿塔骰的team call插件，方便kp开团或公布信息时艾特调查员们。\nver  2.0  made by 地窖上的松\n.team set+@调查员//添加调查员(一次可添加多名调查员)\n.team del+@调查员//移出调查员\n.team clr//清空本群team\n.team call//呼唤team中的调查员\n.team show//展示本群team列表"
+
+
+-------------------------------------------------------------------------
+--核心函数--
+-------------------------------------------------------------------------
 
 list_name = "list.json"
 global_path = getDiceDir() .. "/plugin/call/"
@@ -33,7 +43,7 @@ if call_list == nil then
     call_list = {}
 end
 
-function table.search(array, value) --从数组array中检索value并返回下标,没有的话就返回nil（要求有array这个数组存在，不然会报错）
+function table.search(array, value) --从数组array中检索value并返回下标,没有的话就返回nil（要求有array这个数组存在且不为空，不然会报错）
     --（说起来我一直没有搞懂数组和表到底有什么区别#移目）--
     for i = 1, #array do
         if array[i] == value then
@@ -51,99 +61,59 @@ function index_search(array) --检索是否有这个table
     end
 end
 
+function string.split(str) --将str中的一个个艾特的cq码中的QQ号取出，然后分别存入table中
+    local str_tab = {} --初始化table
+    while (true) do --直到遇到break都会一直循环
+        local findstart, findend = string.find(str, "%d+") --找到QQ号前的“at:”，返回a所对应的位置与:所对应的位置
+        if not (findstart and findend) then
+            break
+
+        end
+        local sub_str = string.sub(str, findstart, findend) --截取一个QQ号
+        if not table.search(str_tab, sub_str) then --如果不重复，则加入表中(待完善)
+            table.insert(str_tab, sub_str) --将截取的部分加到表中
+        end
+        str = string.sub(str, findend + 1, #str) --将截出QQ号后的cq码删掉
+    end
+    return str_tab --将成果返回
+end
+
 function at_oneself() --艾特的核心函数（
     return "{at}"
 end
 
---指令部分--
+-------------------------------------------------------------------------
+--插件运行流程--
+-------------------------------------------------------------------------
 
-function team_add(msg) --添加个人
-    local adder = string.match(msg.fromMsg, "%d+") --从接收的命令中提取QQ号
-    local Gid = "G" .. msg.fromGroup --将群号保存为变量，方便写入索引
-    if #Gid < 5 then --如果消息是从私聊窗口发出的，Gid的值会是"G0"，所以随便写一个条件判断就能筛去私聊窗口发出的指令
-        return "请在群聊中使用此指令"
-    else
-        if adder == nil or #adder <= 4 then
-            return "请使用.team add+@调查员 来将调查员加入本群team" --如果add后面跟了奇奇怪怪的东西或者为空就返回这个
-        elseif #adder >= 13 then
-            return "请保证每次只添加一名调查员" --如果add后面同时艾特了一个以上就返回这个
+function team(msg) --指令优先级：call > show > clr > set > del > help
+    local str = string.match(msg.fromMsg, "(.*)", 6) --将team后的字符全部取出
+    local Gid = "G" .. msg.fromGroup
+    if #Gid < 5 then --总之先把私聊信息排除掉
+        return team_help_text .. "\n请在群聊中使用此插件"
+
+
+    elseif string.match(str, "show") then
+        if not index_search(call_list[Gid]) then --检索本群是否有team
+            return "本群team为空x"
         else
-            local if_have_team = index_search(call_list[Gid]) --判断本群是否已有team列表
-            if if_have_team == false then --如果本群没有team列表（json中没有对应G【q群号】的数组）则新建一个
-                call_list[Gid] = { adder } --新建本群team表
-                save_json(global_path .. list_name, call_list) --储存
-                return "成功将此人加入本群team"
-            else --如果本群已有team表
-                local if_in_team = table.search(call_list[Gid], adder)
-                if if_in_team ~= nil then --判断此人是否在team中
-                    return "此人已在本群team中" --在team中就不执行这些
-                else
-                    table.insert(call_list[Gid], adder) --将此人QQ号加入表中
-                    save_json(global_path .. list_name, call_list) --储存
-                    return "成功将此人加入本群team"
+            local j = call_list[Gid] --将本群team从call_list中取出，以进行后续操作
+            show_list = {} --初始化show_list表
+            for i = 1, #j do --将调查员一个个加入show_list中
+                local name = getPlayerCardAttr(j[i], msg.fromGroup, "__Name", "角色卡") --获取群员名字
+                if name == "角色卡" then
+                    name = getUserConf(j[i], "nick#" .. msg.fromGroup, j[i]) --如果没有用nn指令设置名字的话就使用群名，群名都没有（应该不会吧）的话就使用QQ号
                 end
+                table.insert(show_list, name)
             end
+            local showlist = table.concat(show_list, "\n") --将show_list中的调查员取出，在一个字符串中连接起来
+            return "本群team成员有：\n" .. showlist
         end
-    end
-end
 
-function team_del(msg) --删除个人
-    local deler = string.match(msg.fromMsg, "%d+")
-    local Gid = "G" .. msg.fromGroup
-    local if_have_team = index_search(call_list[Gid])
-    if #Gid < 5 then --同上，检测是否为私聊窗口的指令
-        return "请在群聊中使用此指令"
-    else
-        if #deler == nil or #deler <= 4 then
-            return "请使用.team del+@调查员 来将调查员移出本群team"
-        elseif #deler >= 13 then
-            return "请保证每次只移出一名调查员"
-        elseif if_have_team == false then --如果本群无team表则不执行下面的操作，不然会报错
-            return "本群team为空"
-        else
-            local if_in_team = table.search(call_list[Gid], deler)
-            if if_in_team == nil then --判断此人是否不在team里面
-                return "此人不在本群team中"
-            else
-                local k = #call_list[Gid]
-                if k == 1 then --判断此人是否为team中最后一个
-                    call_list[Gid] = nil --删除本群team表，以防留下空表占用内存
-                    save_json(global_path .. list_name, call_list) --储存
-                    return "成功将此人移出本群team"
-                else
-                    table.remove(call_list[Gid], if_in_team) --将此人QQ号移出表
-                    save_json(global_path .. list_name, call_list) --储存
-                    return "成功将此人移出本群team"
-                end
-            end
-        end
-    end
-end
 
-function team_clear(msg) --删除全队
-    local Gid = "G" .. msg.fromGroup
-    if #Gid < 5 then
-        return "请在群聊中使用此指令"
-    else
-        local if_have_team = index_search(call_list[Gid]) --判断本群有无team列表
-        if if_have_team == false then --如果没有的话
-            return "本群team为空"
-        else
-            call_list[Gid] = nil --直接删除本群team表，以防留下空表占用内存
-            save_json(global_path .. list_name, call_list) --储存
-            return "已清除本群team"
-        end
-    end
-end
-
-function call(msg) --呼叫队员
-    local Gid = "G" .. msg.fromGroup
-    if #Gid < 5 then
-        return "请在群聊中使用此指令"
-    else
-        local if_have_team = index_search(call_list[Gid]) --判断本群有无team列表
-        if if_have_team == false then --如果没有的话
-            return "本群team为空"
+    elseif string.match(str, "call") then --如果从指令中匹配到call就执行call
+        if not index_search(call_list[Gid]) then --检索本群是否有team，即json中是否有以"Gid"为名的数组
+            return "本群team为空x"
         else
             sendMsg("守秘人正在呼唤以下调查员：", msg.fromGroup, 0)
             local j = call_list[Gid] --将call_list表中对应本群的team列表取出，不然没法子作为参数写进函数里
@@ -152,41 +122,81 @@ function call(msg) --呼叫队员
                 sleepTime(sleep_time) --休息一下下免得艾特太快被tx鲨掉
             end
         end
-    end
-end
 
-function team_show(msg) --展示本群team成员
-    local Gid = "G" .. msg.fromGroup
-    if #Gid < 5 then
-        return "请在群聊中使用此指令"
-    else
-        local if_have_team = index_search(call_list[Gid]) --判断本群有无team列表
-        if if_have_team == false then --如果没有的话
-            return "本群team为空"
+
+    elseif string.match(str, "clr") then
+        if not index_search(call_list[Gid]) then --检索本群是否有team
+            return "本群team为空x"
         else
-            local j = call_list[Gid]
-            sendMsg("本群team成员有：", msg.fromGroup, 0)
-            for i = 1, #j do --同call，用循环实现show
-                sleepTime(sleep_time)
-                local k = getPlayerCardAttr(j[i], msg.fromGroup, "__Name", "角色卡") --获取群员名字
-                if k == "角色卡" then
-                    k = getUserConf(j[i], "nick#" .. msg.fromGroup, j[i]) --如果没有用nn指令设置名字的话就使用群名，群名都没有（应该不会吧）的话就使用QQ号
+            call_list[Gid] = nil --直接删除本群team表，以防留下空表占用内存
+            save_json(global_path .. list_name, call_list) --储存
+            return "已清除本群team ✓"
+        end
+
+
+    elseif string.match(str, "set") then
+        local adder_list = string.split(str) --从接收的命令中提取QQ号
+        if not index_search(call_list[Gid]) then --如果本群没有team列表，那就创建一个
+            call_list[Gid] = adder_list --新建本群team表并把调查员直接加进去
+            save_json(global_path .. list_name, call_list) --储存
+            return "成功将" .. #adder_list .. "名调查员加入本群team✓"
+        else
+            local add_number = #adder_list
+            for i = 1, #adder_list do --用循环一个个判断调查员是否在list中
+                if table.search(call_list[Gid], adder_list[i]) then --如果在list中就先把此调查员从list中移除，然后再一起加入list。如果把此调查员从adder_list中移出的话总感觉会陷入什么坑中所以稍微绕一下路
+                    local k = table.search(call_list[Gid], adder_list[i])
+                    table.remove(call_list[Gid], k)
+                    --save_json(global_path .. list_name, call_list)
+                    add_number = add_number - 1
                 end
-                sendMsg(k, msg.fromGroup, 0)
+            end
+            for i = 1, #adder_list do --再一个个把调查员加入list中
+                table.insert(call_list[Gid], adder_list[i])
+            end
+            save_json(global_path .. list_name, call_list) --储存
+            if add_number ~= 0 then
+                return "成功将" .. add_number .. "名调查员加入本群team✓"
+            else
+                return "这些调查员已经在本群team中x"
             end
         end
-    end
-end
 
-function call_help()
-    return "仿塔骰的team call插件，方便kp开团或公布信息时艾特调查员们。\nver  1.1  made by 地窖上的松\n.add+@调查员//添加调查员\n.del+@调查员//移出调查员\n.team clear//清空本群team\n.team call//呼唤team中的调查员\n.team show//展示本群team列表"
+
+    elseif string.match(str, "del") then
+        deler_list = string.split(str) --提取QQ号
+        local deler_number = #deler_list
+        if index_search(call_list[Gid]) == false then --如果本群无team表则不执行下面的操作，不然会报错
+            return "本群team为空x"
+        else
+            for i = 1, #deler_list do --用循环一个个查找deler_list中的调查员在list中的位置并移出
+                local k = table.search(call_list[Gid], deler_list[i])
+                if k then --如果此调查员在list中就移出，不然就啥都不做
+                    if #call_list[Gid] == 1 then --判断此人是否为team中最后一个，如果是最后一个就直接删除本群team表，以防留下空表占用内存
+                        call_list[Gid] = nil
+                    else --如果不是最后一个就正常移出
+                        table.remove(call_list[Gid], k)
+                    end
+                else
+                    deler_number = deler_number - 1
+                end
+            end
+            save_json(global_path .. list_name, call_list) --储存
+            if deler_number ~= 0 then
+                return "成功将" .. deler_number .. "名调查员移出本群team✓"
+            else
+                return "这些调查员都不在本群team中x"
+            end
+        end
+
+
+    else --如果一个指令都匹配不上，就返回help信息
+        return call_help_text
+    end
 end
 
 msg_order = {}
-msg_order[".add"] = "team_add"
-msg_order[".del"] = "team_del"
-msg_order[".team clear"] = "team_clear"
-msg_order[".team call"] = "call"
-msg_order["at_oneself"] = "at_oneself"
-msg_order[".team show"] = "team_show"
-msg_order[".call help"] = "call_help"
+msg_order[".team"] = "team"
+msg_order[".add"] = help_text --先写个指令在这免得更新之后还有骰子用户使用旧版指令（
+function help_text()
+    return call_help_text
+end
