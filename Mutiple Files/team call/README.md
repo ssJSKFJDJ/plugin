@@ -1,4 +1,4 @@
-    gocq_api
+    team_call
        | |-call.lua #脚本主体
        |
        |-call #配置文件存放文件夹
