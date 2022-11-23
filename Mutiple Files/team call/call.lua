@@ -80,7 +80,7 @@ function team(msg) --指令优先级：call > show > clr > set > del > help
     local str = string.match(msg.fromMsg, "(.*)", 6) --将team后的字符全部取出
     local Gid = "G" .. msg.fromGroup
     if #Gid < 5 then --总之先把私聊信息排除掉
-        return "仿塔骰的team call插件，方便kp开团或公布信息时艾特调查员们。\nver  2.1  made by 地窖上的松\n.team set+@调查员//添加调查员(一次可添加多名调查员)\n.team del+@调查员//移出调查员\n.team clr//清空本群team\n.team call//呼唤team中的调查员\n.team show//展示本群team列表\n请在群聊中使用此插件"
+        return call_help_text .. "\n请在群聊中使用此插件"
 
 
     elseif string.match(str, "show") then
